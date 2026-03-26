@@ -3,6 +3,8 @@ import asyncio
 import logging
 from datetime import datetime, date, timedelta
 from io import BytesIO
+from sched import scheduler
+import token
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -960,41 +962,16 @@ async def main():
 
     app = Application.builder().token(token).build()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("status", status))
-    app.add_handler(CommandHandler("done", done))
-    app.add_handler(CommandHandler("habit", habit))
-    app.add_handler(CommandHandler("addhabit", addhabit))
-    app.add_handler(CommandHandler("revenue", revenue))
-    app.add_handler(CommandHandler("weekly", weekly))
-    app.add_handler(CommandHandler("addgoal", addgoal))
-    app.add_handler(CommandHandler("challenge", challenge))
-    app.add_handler(CommandHandler("stats", stats_cmd))
-    app.add_handler(CommandHandler("leaderboard", leaderboard))
-    app.add_handler(CommandHandler("shop", shop))
-    app.add_handler(CommandHandler("history", history))
-    app.add_handler(CommandHandler("setup", setup))
-    app.add_handler(CommandHandler("settoken", settoken))
-    app.add_handler(CommandHandler("coins", coins_cmd))
-    app.add_handler(CommandHandler("help", help_cmd))
-    app.add_handler(CallbackQueryHandler(callback_handler))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_message))
-
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(lambda: asyncio.create_task(send_morning_reminder(app.bot)),
-                      "cron", hour=8, minute=0)
-    scheduler.add_job(lambda: asyncio.create_task(send_evening_checkin(app.bot)),
-                      "cron", hour=21, minute=0)
-    scheduler.add_job(lambda: asyncio.create_task(send_weekly_recap(app.bot)),
-                      "cron", day_of_week="sun", hour=20, minute=0)
+    scheduler.add_job(lambda: asyncio.create_task(send_morning_reminder(app.bot)), "cron", hour=8)
+    scheduler.add_job(lambda: asyncio.create_task(send_evening_checkin(app.bot)), "cron", hour=21)
+    scheduler.add_job(lambda: asyncio.create_task(send_weekly_recap(app.bot)), "cron", day_of_week="sun", hour=20)
     scheduler.start()
 
-    await run_web_server(app.bot)
+    asyncio.create_task(run_web_server(app.bot))
 
-    logger.info("🚀 BizTracker Bot v2 démarré !")
-    await app.initialize()
-    await app.initialize()
-    await app.bot.delete_webhook(drop_pending_updates=True)
+    print("🚀 Bot lancé")
+
     await app.run_polling()
 
 if __name__ == "__main__":
