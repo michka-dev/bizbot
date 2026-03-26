@@ -1,121 +1,98 @@
-# 🚀 BizTracker Bot — Telegram
+# 🚀 BizTracker Bot v2
 
-Un bot Telegram qui gamifie ton business : tâches, revenus, habitudes, objectifs hebdo, coins et boutique de récompenses.
-
----
-
-## ⚡ Installation rapide (5 min)
-
-### 1. Crée ton bot Telegram
-1. Ouvre Telegram, cherche **@BotFather**
-2. Envoie `/newbot`
-3. Donne un nom : ex. `Mon BizTracker`
-4. Donne un username : ex. `monbiztracker_bot`
-5. Copie le **token** qu'il te donne (ressemble à : `123456789:ABCdef...`)
+Bot Telegram ultra-complet pour gamifier ton business.
+Todoist sync, Notion journal, graphiques visuels, défis hebdo, leaderboard, rappels auto.
 
 ---
 
-### 2. Déploie sur Railway (gratuit)
+## ⚡ Setup Railway (5 min)
 
-1. Va sur [railway.app](https://railway.app) et connecte ton GitHub
-2. Clique **New Project → Deploy from GitHub repo**
-3. Upload ou push ce dossier sur un repo GitHub public/privé
-4. Dans Railway → ton projet → **Variables** → Ajoute :
-   ```
-   BOT_TOKEN = ton_token_ici
-   ```
-5. Railway démarre automatiquement ton bot ✅
+### 1. Variables d'environnement sur Railway
+```
+BOT_TOKEN     = ton token BotFather
+```
 
-**Alternative : Render.com**
-1. Va sur [render.com](https://render.com)
-2. New → Web Service → connecte ton repo
-3. Build Command : `pip install -r requirements.txt`
-4. Start Command : `python bot.py`
-5. Ajoute la variable d'environnement `BOT_TOKEN`
-
----
-
-### 3. Option locale (pour tester)
-
-```bash
-# Installe les dépendances
-pip install -r requirements.txt
-
-# Crée un fichier .env (optionnel, ou exporte directement)
-export BOT_TOKEN="ton_token_ici"
-
-# Lance le bot
-python bot.py
+### 2. Variables optionnelles
+```
+DB_PATH       = biztracker.db   (chemin base de données)
+PORT          = 8080            (pour le webhook Todoist)
+TODOIST_CLIENT_SECRET = ...     (optionnel, pour sécuriser les webhooks)
 ```
 
 ---
 
-## 📱 Commandes disponibles
+## 🔗 Connecter Todoist
 
-### Tracker
-| Commande | Description | Coins gagnés |
-|---|---|---|
-| `/done [tâche]` | Logger une tâche complétée | 20-80 🪙 |
-| `/revenue [montant] [source]` | Ajouter des revenus | 10🪙 / 100$ |
-| `/habit` | Cocher habitudes du jour | 15 🪙 chacune |
-
-### Setup
-| Commande | Description |
-|---|---|
-| `/addhabit [nom]` | Ajouter une habitude quotidienne |
-| `/addgoal [texte]` | Ajouter un objectif hebdo |
-
-### Stats
-| Commande | Description |
-|---|---|
-| `/status` | Dashboard complet avec barres de progression |
-| `/weekly` | Voir et cocher objectifs de la semaine |
-| `/history` | Historique des 7 derniers jours |
-| `/coins` | Voir ton solde |
-
-### Récompenses
-| Commande | Description |
-|---|---|
-| `/shop` | Boutique — dépenser ses coins |
+1. Dans le bot → `/setup` → "Connecter Todoist"
+2. Va sur todoist.com → Settings → Integrations → API token
+3. Dans le bot : `/settoken todoist TON_API_TOKEN`
+4. Configure le webhook dans Todoist Developer Console :
+   - URL : `https://TON-APP.railway.app/webhook/todoist`
+   - Événement : `item:completed`
 
 ---
 
-## 🪙 Système de coins
+## 📓 Connecter Notion
 
+1. Va sur notion.so/my-integrations → "New integration"
+2. Copie le "Internal Integration Secret"
+3. Dans le bot : `/settoken notion secret_XXXXX`
+4. Le bot crée automatiquement une DB "BizTracker Journal" dans Notion
+
+---
+
+## 📊 Fonctionnalités
+
+### Commandes
+| Commande | Description |
+|---|---|
+| `/status` | Dashboard avec XP, coins, streak, stats hebdo |
+| `/done [tâche]` | Logger une tâche (simple/moyen/difficile) |
+| `/revenue [montant] [source]` | Ajouter revenus |
+| `/habit` | Cocher habitudes du jour |
+| `/addhabit [nom]` | Créer une habitude |
+| `/weekly` | Objectifs de la semaine |
+| `/addgoal [texte]` | Créer un objectif |
+| `/challenge` | Voir/générer défis hebdo |
+| `/stats` | Graphique visuel complet 📊 |
+| `/leaderboard` | Classement XP semaine |
+| `/shop` | Boutique récompenses |
+| `/history` | Historique 7 jours |
+| `/setup` | Configurer Todoist/Notion/Rappels |
+| `/settoken [service] [token]` | Connecter un service |
+| `/coins` | Voir solde + niveau + statut |
+
+### Coins gagnés
 | Action | Coins |
 |---|---|
 | Tâche simple | +20 🪙 |
 | Tâche moyenne | +40 🪙 |
 | Tâche difficile | +80 🪙 |
+| Todoist P1 (urgent) | +80 🪙 |
+| Todoist P2 | +40 🪙 |
 | Habitude cochée | +15 🪙 |
 | Objectif hebdo | +150 🪙 |
-| Revenus (par 100$) | +10 🪙 |
-| Streak 7 jours | +200 🪙 bonus |
-| Streak 30 jours | +500 🪙 bonus |
-| Level up | +100 🪙 bonus |
+| Défi complété | +200-400 🪙 |
+| Streak 7 jours | +200 🪙 |
+| Streak 30 jours | +500 🪙 |
+| Level up | +100 🪙 |
 
----
+### Boutique (shop)
+| Récompense | Coût | Tier |
+|---|---|---|
+| ☕ Café de luxe | 30 🪙 | Bronze |
+| 🏋️ Session sport | 60 🪙 | Bronze |
+| 🍦 Dessert premium | 80 🪙 | Bronze |
+| 🎬 Movie night | 150 🪙 | Bronze |
+| 🍕 Resto de luxe | 250 🪙 | Silver |
+| 🌴 Free day | 350 🪙 | Silver |
+| 🎧 Nouvel accessoire | 400 🪙 | Silver |
+| 🎮 Nouveau jeu | 500 🪙 | Gold |
+| ✈️ Weekend trip | 1500 🪙 | Gold |
+| 👑 Big reward | 3000 🪙 | Legend |
 
-## 🏪 Boutique par défaut
-
-| Récompense | Coût |
-|---|---|
-| ☕ Café de luxe | 30 🪙 |
-| 🏋️ Session sport | 60 🪙 |
-| 🍦 Dessert premium | 80 🪙 |
-| 🎬 Movie night | 150 🪙 |
-| 🍕 Resto de luxe | 250 🪙 |
-| 🌴 Free day | 350 🪙 |
-| 🎧 Nouvel accessoire | 400 🪙 |
-| 🎮 Nouveau jeu | 500 🪙 |
-
-> Tu peux modifier les items du shop directement dans `database.py` → `DEFAULT_SHOP_ITEMS`
-
----
-
-## 🎮 Système de niveaux (XP)
-
-| Niveau | XP requis |
+### Niveaux XP
+| Niveau | XP |
 |---|---|
 | 🌱 Débutant | 0 |
 | ⚡ Hustle Mode | 500 |
@@ -124,65 +101,24 @@ python bot.py
 | 🚀 Entrepreneur | 6 000 |
 | 👑 Business King | 10 000 |
 | 🌍 Empire Builder | 20 000 |
+| 🏛️ Légende | 50 000 |
+
+### Automatisations
+- ☀️ **Rappel matin 8h** — quote motivante + stats + défis actifs
+- 🌙 **Check-in soir 21h** — récap + alerte si streak en danger + sync Notion
+- 📆 **Récap dimanche 20h** — bilan semaine complet + comparaison % + sync Notion
 
 ---
 
-## 🛠 Personnaliser
-
-### Modifier les récompenses du shop
-Dans `database.py`, modifie `DEFAULT_SHOP_ITEMS` :
-```python
-DEFAULT_SHOP_ITEMS = [
-    (1, "🎮", "Nouveau jeu", "Steam / PS Store", 500),
-    (2, "🌴", "Free day",   "Journée sans boulot", 350),
-    # Ajoute tes propres récompenses ici !
-]
+## 📁 Structure
 ```
-
-### Modifier les gains de coins
-Dans `bot.py`, modifie le dict `COINS` :
-```python
-COINS = {
-    "task_simple": 20,   # Augmente si tu veux gagner plus vite
-    "task_medium": 40,
-    ...
-}
-```
-
----
-
-## 📁 Structure du projet
-
-```
-bizbot/
-├── bot.py          # Logique principale du bot
-├── database.py     # Base de données SQLite
+bizbot_v2/
+├── bot.py              # Logique principale + schedulers + webhook
+├── database.py         # SQLite — toutes les tables
+├── stats_image.py      # Génération graphiques matplotlib
+├── notion_client.py    # API Notion
+├── todoist_handler.py  # Webhook Todoist
 ├── requirements.txt
-├── Procfile        # Pour Railway/Render
+├── Procfile
 └── README.md
-```
-
----
-
-## 💡 Tips d'utilisation
-
-**Pour le clipping :**
-```
-/addgoal Poster 5 clips cette semaine
-/addhabit Éditer 1 clip par jour
-/done Montage clip #12 pour @compte
-```
-
-**Pour le trading :**
-```
-/addhabit Revue marché 30min le matin
-/revenue 250 Day trading
-/done Backtesté nouvelle stratégie
-```
-
-**Pour les réseaux sociaux :**
-```
-/addgoal Atteindre 1000 vues sur TikTok
-/addhabit Poster 1 contenu par jour
-/done Reel Instagram — 3 prises
 ```
