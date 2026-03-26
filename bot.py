@@ -993,9 +993,9 @@ async def main():
 
     logger.info("🚀 BizTracker Bot v2 démarré !")
     await app.initialize()
-    await app.start()
-    await app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
-    await asyncio.Event().wait()
+    await app.initialize()
+    await app.bot.delete_webhook(drop_pending_updates=True)
+    await app.run_polling()
 
 if __name__ == "__main__":
     asyncio.run(main())
