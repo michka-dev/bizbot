@@ -3,8 +3,6 @@ import asyncio
 import logging
 from datetime import datetime, date, timedelta
 from io import BytesIO
-from sched import scheduler
-import token
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
